@@ -187,7 +187,6 @@ const styles = StyleSheet.create({
     marginTop:30,
     borderTopRightRadius:30,
     borderTopLeftRadius:30,
-
   },
   scrollContent: {
     paddingBottom: 20,
