@@ -1,98 +1,343 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={styles.container}>
+      {/* Fixed Header Section (TopBar) */}
+      <View style={styles.fixedHeader}>
+        <SafeAreaView edges={["top"]} style={styles.safeArea}>
+          <View style={styles.topBar}>
+            <Text style={styles.logoText}>SERANIA</Text>
+            <TouchableOpacity>
+              <Ionicons name="menu" size={28} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Scrollable Header Section (Greeting) */}
+        <View style={styles.scrollableHeader}>
+          <View style={styles.safeArea}>
+            <View style={styles.greetingContainer}>
+              <Text style={styles.greetingText}>
+                Bonjour, Mickael 👋{"\n"}
+                Comment vous{"\n"}
+                <Text style={styles.boldText}>sentez-vous</Text> aujourd’hui ?
+              </Text>
+
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Que ressentez-vous ?"
+                  placeholderTextColor="#5A7D70"
+                />
+                <TouchableOpacity style={styles.inputIcon}>
+                  <Ionicons
+                    name="arrow-up-outline"
+                    size={20}
+                    style={{ transform: [{ rotate: "45deg" }] }}
+                    color="#333"
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Mood Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Mon Humeur Du Jour</Text>
+          <View style={styles.moodContainer}>
+            {["😊", "😐", "😔", "😭", "😡"].map((emoji, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.moodItem, index === 1 && styles.moodSelected]}
+              >
+                <Text style={styles.moodEmoji}>{emoji}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Progress Section */}
+        <View style={styles.section}>
+          <View style={styles.progressCard}>
+            <Text style={styles.progressTitle}>Vos progrès</Text>
+            <Text style={styles.progressValue}>67%</Text>
+            <View style={styles.chartContainer}>
+              {/* Simulated Chart Placeholder */}
+              <View style={styles.chartLine} />
+              <Ionicons
+                name="radio-button-on"
+                size={24}
+                color="#6DD5B8"
+                style={styles.chartPoint}
+              />
+              <View style={styles.chartPlaceholder}>
+                <Text
+                  style={{
+                    color: "#555",
+                    fontSize: 10,
+                    position: "absolute",
+                    bottom: 10,
+                    left: 10,
+                  }}
+                >
+                  Jan
+                </Text>
+                <Text
+                  style={{
+                    color: "#555",
+                    fontSize: 10,
+                    position: "absolute",
+                    bottom: 10,
+                    right: 10,
+                  }}
+                >
+                  Dec
+                </Text>
+
+                <View
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 50,
+                    borderTopWidth: 2,
+                    borderColor: "#6DD5B8",
+                    borderTopLeftRadius: 50,
+                    borderTopRightRadius: 20,
+                    opacity: 0.5,
+                  }}
+                />
+                <View
+                  style={{
+                    position: "absolute",
+                    bottom: 20,
+                    left: 20,
+                    right: 60,
+                    height: 40,
+                    borderTopWidth: 2,
+                    borderColor: "#FFCC80",
+                    borderTopLeftRadius: 30,
+                    borderTopRightRadius: 40,
+                    opacity: 0.5,
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Recent Conversations Section */}
+        <View style={[styles.section, { marginBottom: 100 }]}>
+          <Text style={styles.sectionTitle}>Conversation récentes</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.recentScroll}
+          >
+            {[1, 2].map((item) => (
+              <View key={item} style={styles.recentCard}>
+                <View style={styles.recentHeader}>
+                  <View style={styles.tagContainer}>
+                    <Text style={styles.tagText}>Aujourd'hui</Text>
+                  </View>
+                  <Text style={styles.categoryText}>Lecture</Text>
+                </View>
+                <Text style={styles.recentTitle}>
+                  Titre de la conversation en précisant la catégorie
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  fixedHeader: {
+    backgroundColor: "#C8E6C9", // Minty green
+    zIndex: 10,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  scrollContent: {
+    paddingBottom: 20,
+  },
+  scrollableHeader: {
+    backgroundColor: "#C8E6C9", // Minty green
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    paddingBottom: 30,
+    marginTop: -1, // Avoid hairline crack
+    paddingTop: 10,
+  },
+  safeArea: {
+    paddingHorizontal: 20,
+  },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  logoText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    fontStyle: "italic",
+  },
+  greetingContainer: {
+    marginTop: 0,
+  },
+  greetingText: {
+    fontSize: 24,
+    color: "#1A2E28",
+    lineHeight: 32,
+    marginBottom: 20,
+  },
+  boldText: {
+    fontWeight: "bold",
+  },
+  inputContainer: {
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#1A2E28",
+  },
+  inputIcon: {
+    marginLeft: 10,
+  },
+  section: {
+    marginTop: 25,
+    paddingHorizontal: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#000",
+    marginBottom: 15,
+  },
+  moodContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  moodItem: {
+    padding: 5,
+    borderRadius: 30,
+  },
+  moodSelected: {
+    backgroundColor: "#C8E6C9",
+    borderWidth: 2,
+    borderColor: "#8FC9B3",
+  },
+  moodEmoji: {
+    fontSize: 32,
+  },
+  progressCard: {
+    backgroundColor: "#D6EAE2",
+    borderRadius: 20,
+    padding: 20,
+  },
+  progressTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#1A2E28",
+    marginBottom: 5,
+  },
+  progressValue: {
+    fontSize: 48,
+    fontWeight: "bold",
+    color: "#000",
+    marginBottom: 15,
+  },
+  chartContainer: {
+    height: 120,
+    backgroundColor: "#1F202F",
+    borderRadius: 15,
+    position: "relative",
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chartPlaceholder: {
+    width: "100%",
+    height: "100%",
+  },
+  chartLine: {},
+  chartPoint: {
+    position: "absolute",
+    top: 40,
+    left: "60%",
+    zIndex: 10,
+  },
+  recentScroll: {
+    overflow: "visible",
+  },
+  recentCard: {
+    backgroundColor: "#3D6056",
+    borderRadius: 15,
+    padding: 15,
+    width: width * 0.6,
+    marginRight: 15,
+    height: 120,
+    justifyContent: "space-between",
+  },
+  recentHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  tagContainer: {
+    backgroundColor: "rgba(255,255,255,0.3)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 5,
+  },
+  tagText: {
+    color: "#fff",
+    fontSize: 10,
+  },
+  categoryText: {
+    color: "#ccc",
+    fontSize: 12,
+  },
+  recentTitle: {
+    color: "#fff",
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
