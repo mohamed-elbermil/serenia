@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -14,6 +14,10 @@ import { Ionicons } from "@expo/vector-icons";
 const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
+  const [selectedMoodIndex, setSelectedMoodIndex] = useState<number | null>(
+    null,
+  );
+
   return (
     <View style={styles.container}>
       {/* Fixed Header Section (TopBar) */}
@@ -68,7 +72,11 @@ export default function HomeScreen() {
             {["😊", "😐", "😔", "😭", "😡"].map((emoji, index) => (
               <TouchableOpacity
                 key={index}
-                style={[styles.moodItem, index === 1 && styles.moodSelected]}
+                onPress={() => setSelectedMoodIndex(index)}
+                style={[
+                  styles.moodItem,
+                  selectedMoodIndex === index && styles.moodSelected,
+                ]}
               >
                 <Text style={styles.moodEmoji}>{emoji}</Text>
               </TouchableOpacity>
@@ -183,10 +191,10 @@ const styles = StyleSheet.create({
   fixedHeader: {
     backgroundColor: "#C8E6C9", // Minty green
     zIndex: 10,
-    marginHorizontal:20,
-    marginTop:30,
-    borderTopRightRadius:30,
-    borderTopLeftRadius:30,
+    marginHorizontal: 20,
+    marginTop: 30,
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
   },
   scrollContent: {
     paddingBottom: 20,
@@ -197,19 +205,18 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 30,
     paddingBottom: 30,
     paddingTop: 10,
-    marginHorizontal: 20,  // left + right
+    marginHorizontal: 20, // left + right
   },
   safeArea: {
     paddingHorizontal: 20,
   },
   topBar: {
-    padding:10,
+    padding: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
     marginTop: 10,
-    
   },
   logoText: {
     fontSize: 18,
