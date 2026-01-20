@@ -183,6 +183,11 @@ const styles = StyleSheet.create({
   fixedHeader: {
     backgroundColor: "#C8E6C9", // Minty green
     zIndex: 10,
+    marginHorizontal:20,
+    marginTop:30,
+    borderTopRightRadius:30,
+    borderTopLeftRadius:30,
+
   },
   scrollContent: {
     paddingBottom: 20,
@@ -192,18 +197,20 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     paddingBottom: 30,
-    marginTop: -1, // Avoid hairline crack
     paddingTop: 10,
+    marginHorizontal: 20,  // left + right
   },
   safeArea: {
     paddingHorizontal: 20,
   },
   topBar: {
+    padding:10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
     marginTop: 10,
+    
   },
   logoText: {
     fontSize: 18,
@@ -225,7 +232,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     backgroundColor: "rgba(255, 255, 255, 0.4)",
-    borderRadius: 25,
+    borderRadius: 95,
     paddingHorizontal: 20,
     paddingVertical: 12,
     flexDirection: "row",
