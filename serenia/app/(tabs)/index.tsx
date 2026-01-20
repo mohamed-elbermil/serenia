@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -7,6 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Animated,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,22 +19,65 @@ export default function HomeScreen() {
   const [selectedMoodIndex, setSelectedMoodIndex] = useState<number | null>(
     null,
   );
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Menu Animation
+  const MENU_WIDTH = width * 0.75;
+  const menuTranslateX = useRef(new Animated.Value(MENU_WIDTH)).current;
+  const fadeAnimation = useRef(new Animated.Value(0)).current;
+
+  const toggleMenu = () => {
+    if (isMenuOpen) {
+      // Close menu
+      Animated.parallel([
+        Animated.timing(menuTranslateX, {
+          toValue: MENU_WIDTH,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnimation, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setIsMenuOpen(false));
+    } else {
+      // Open menu
+      setIsMenuOpen(true);
+      Animated.parallel([
+        Animated.timing(menuTranslateX, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnimation, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  };
+
+  // Scroll Animation configuration
+  const SCROLL_DISTANCE = 50;
 
   return (
     <View style={styles.container}>
       {/* Fixed Header Section (TopBar) */}
-      <View style={styles.fixedHeader}>
+      <Animated.View style={styles.fixedHeader}>
         <SafeAreaView edges={["top"]} style={styles.safeArea}>
           <View style={styles.topBar}>
             <Text style={styles.logoText}>SERANIA</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={toggleMenu}>
               <Ionicons name="menu" size={28} color="#fff" />
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-      </View>
+      </Animated.View>
 
-      <ScrollView
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -178,7 +223,51 @@ export default function HomeScreen() {
             ))}
           </ScrollView>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
+
+      {/* Menu Overlay and Drawer */}
+      {isMenuOpen && (
+        <Animated.View style={[styles.menuOverlay, { opacity: fadeAnimation }]}>
+          <Pressable style={styles.menuOverlayPressable} onPress={toggleMenu} />
+        </Animated.View>
+      )}
+
+      <Animated.View
+        style={[
+          styles.menuDrawer,
+          { transform: [{ translateX: menuTranslateX }] },
+        ]}
+      >
+        <SafeAreaView style={styles.menuContent}>
+          <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
+            <Ionicons name="close" size={30} color="#1A2E28" />
+          </TouchableOpacity>
+
+          <View style={styles.menuItemsContainer}>
+            <TouchableOpacity style={styles.menuItem}>
+              <Ionicons name="person-outline" size={24} color="#1A2E28" />
+              <Text style={styles.menuItemText}>Mon Profil</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Ionicons name="settings-outline" size={24} color="#1A2E28" />
+              <Text style={styles.menuItemText}>Paramètres</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Ionicons name="help-circle-outline" size={24} color="#1A2E28" />
+              <Text style={styles.menuItemText}>Aide</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Ionicons name="log-out-outline" size={24} color="#D32F2F" />
+              <Text style={[styles.menuItemText, { color: "#D32F2F" }]}>
+                Déconnexion
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Animated.View>
     </View>
   );
 }
@@ -352,5 +441,58 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     lineHeight: 20,
+  },
+  menuOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    zIndex: 20,
+  },
+  menuOverlayPressable: {
+    flex: 1,
+  },
+  menuDrawer: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: "75%",
+    backgroundColor: "#fff",
+    zIndex: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: -2,
+      height: 0,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  menuContent: {
+    flex: 1,
+    padding: 20,
+  },
+  closeButton: {
+    alignSelf: "flex-end",
+    padding: 10,
+  },
+  menuItemsContainer: {
+    marginTop: 40,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  menuItemText: {
+    fontSize: 16,
+    marginLeft: 15,
+    color: "#1A2E28",
+    fontWeight: "500",
   },
 });
