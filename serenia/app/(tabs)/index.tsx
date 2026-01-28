@@ -212,7 +212,7 @@ export default function HomeScreen() {
               <View key={item} style={styles.recentCard}>
                 <View style={styles.recentHeader}>
                   <View style={styles.tagContainer}>
-                    <Text style={styles.tagText}>Aujourd'hui</Text>
+                    <Text style={styles.tagText}>Aujourd’hui</Text>
                   </View>
                   <Text style={styles.categoryText}>Lecture</Text>
                 </View>
