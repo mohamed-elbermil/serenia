@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { Collapsible } from "@/components/ui/collapsible";
+import BurgerMenu from "@/components/burger-menu";
 
 export default function HelpScreen() {
   return (
@@ -14,6 +15,7 @@ export default function HelpScreen() {
           <Ionicons name="help-circle-outline" size={24} color={Colors.light.tint} />
         </View>
       </SafeAreaView>
+      <BurgerMenu />
 
       <View style={styles.content}>
         <View style={styles.card}>

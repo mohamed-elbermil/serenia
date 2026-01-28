@@ -12,7 +12,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter, usePathname } from "expo-router";
+import { useRouter } from "expo-router";
+import BurgerMenu from "@/components/burger-menu";
 import MoodChart from "@/components/mood-chart";
 import {
   emojiToValue,
@@ -25,68 +26,12 @@ const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const router = useRouter();
-  const pathname = usePathname();
   const [selectedMoodIndex, setSelectedMoodIndex] = useState<number | null>(
     null,
   );
   const [moodAgg, setMoodAgg] = useState<Record<string, MoodAggregate>>({});
   const [chartRange, setChartRange] = useState<7 | 30>(7);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
-
-  // Menu Animation
-  const MENU_WIDTH = width * 0.75;
-  const menuTranslateX = useRef(new Animated.Value(MENU_WIDTH)).current;
-  const fadeAnimation = useRef(new Animated.Value(0)).current;
-
-  const toggleMenu = () => {
-    if (isMenuOpen) {
-      // Close menu
-      Animated.parallel([
-        Animated.timing(menuTranslateX, {
-          toValue: MENU_WIDTH,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnimation, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start(() => setIsMenuOpen(false));
-    } else {
-      // Open menu
-      setIsMenuOpen(true);
-      Animated.parallel([
-        Animated.timing(menuTranslateX, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnimation, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }
-  };
-
-  const navigateTo = (path: "/profile" | "/settings" | "/help") => {
-    router.push(path);
-    Animated.parallel([
-      Animated.timing(menuTranslateX, {
-        toValue: MENU_WIDTH,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnimation, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => setIsMenuOpen(false));
-  };
 
   // Scroll Animation configuration
   const SCROLL_DISTANCE = 50;
@@ -98,12 +43,11 @@ export default function HomeScreen() {
         <SafeAreaView edges={["top"]} style={styles.safeArea}>
           <View style={styles.topBar}>
             <Text style={styles.logoText}>SERANIA</Text>
-            <TouchableOpacity onPress={toggleMenu}>
-              <Ionicons name="menu" size={28} color="#fff" />
-            </TouchableOpacity>
+            <View style={{ width: 28 }} />
           </View>
         </SafeAreaView>
       </Animated.View>
+      <BurgerMenu />
 
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
@@ -175,6 +119,102 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Actions rapides */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Actions rapides</Text>
+          <View style={styles.quickRow}>
+            <TouchableOpacity
+              style={styles.quickBtn}
+              onPress={() => router.push("/(tabs)/patient")}
+            >
+              <Ionicons name="flash-outline" size={18} color="#1A2E28" />
+              <Text style={styles.quickText}>Commencer un exercice</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.quickBtn}
+              onPress={() => router.push("/(tabs)/patient")}
+            >
+              <Ionicons
+                name="chatbubble-ellipses-outline"
+                size={18}
+                color="#1A2E28"
+              />
+              <Text style={styles.quickText}>Ouvrir Espace Patient</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={[styles.quickRow, { marginTop: 8 }]}>
+            <TouchableOpacity
+              style={styles.quickBtn}
+              onPress={() => router.push("/(tabs)/help")}
+            >
+              <Ionicons name="help-circle-outline" size={18} color="#1A2E28" />
+              <Text style={styles.quickText}>Voir l’aide</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.quickBtn}
+              onPress={() => router.push("/(tabs)/profile")}
+            >
+              <Ionicons name="person-outline" size={18} color="#1A2E28" />
+              <Text style={styles.quickText}>Mon profil</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Recommandations */}
+        <View style={styles.section}>
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Recommandations pour vous</Text>
+            <View style={styles.recoRow}>
+              <View style={styles.recoChip}>
+                <Text style={styles.recoText}>Respiration</Text>
+              </View>
+              <View style={styles.recoChip}>
+                <Text style={styles.recoText}>Écriture guidée</Text>
+              </View>
+              <View style={styles.recoChip}>
+                <Text style={styles.recoText}>Marche légère</Text>
+              </View>
+            </View>
+            <Text style={styles.recoHint}>
+              Suggestions basées sur vos humeurs récentes.
+            </Text>
+          </View>
+        </View>
+
+        {/* Catégories importantes */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Catégories</Text>
+          <View style={styles.categoriesGrid}>
+            {[
+              {
+                icon: "leaf-outline",
+                label: "Bien-être",
+                route: "/(tabs)/patient",
+              },
+              { icon: "book-outline", label: "Lecture", route: "/(tabs)/help" },
+              {
+                icon: "heart-outline",
+                label: "Respiration",
+                route: "/(tabs)/patient",
+              },
+              {
+                icon: "pencil-outline",
+                label: "Écriture",
+                route: "/(tabs)/patient",
+              },
+            ].map((c, i) => (
+              <TouchableOpacity
+                key={i}
+                style={styles.categoryCard}
+                onPress={() => router.push(c.route as any)}
+              >
+                <Ionicons name={c.icon as any} size={22} color="#1A2E28" />
+                <Text style={styles.categoryLabel}>{c.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         {/* Recent Conversations Section */}
         <View style={[styles.section, { marginBottom: 100 }]}>
           <Text style={styles.sectionTitle}>Conversation récentes</Text>
@@ -199,68 +239,6 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
       </Animated.ScrollView>
-
-      {/* Menu Overlay and Drawer */}
-      {isMenuOpen && (
-        <Animated.View style={[styles.menuOverlay, { opacity: fadeAnimation }]}>
-          <Pressable style={styles.menuOverlayPressable} onPress={toggleMenu} />
-        </Animated.View>
-      )}
-
-      <Animated.View
-        style={[
-          styles.menuDrawer,
-          { transform: [{ translateX: menuTranslateX }] },
-        ]}
-      >
-        <SafeAreaView style={styles.menuContent}>
-          <TouchableOpacity onPress={toggleMenu} style={styles.closeButton}>
-            <Ionicons name="close" size={30} color="#1A2E28" />
-          </TouchableOpacity>
-
-          <View style={styles.menuItemsContainer}>
-            <TouchableOpacity
-              style={[
-                styles.menuItem,
-                pathname === "/profile" && { backgroundColor: "#F4F9F6" },
-              ]}
-              onPress={() => navigateTo("/profile")}
-            >
-              <Ionicons name="person-outline" size={24} color="#1A2E28" />
-              <Text style={styles.menuItemText}>Mon Profil</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.menuItem,
-                pathname === "/settings" && { backgroundColor: "#F4F9F6" },
-              ]}
-              onPress={() => navigateTo("/settings")}
-            >
-              <Ionicons name="settings-outline" size={24} color="#1A2E28" />
-              <Text style={styles.menuItemText}>Paramètres</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.menuItem,
-                pathname === "/help" && { backgroundColor: "#F4F9F6" },
-              ]}
-              onPress={() => navigateTo("/help")}
-            >
-              <Ionicons name="help-circle-outline" size={24} color="#1A2E28" />
-              <Text style={styles.menuItemText}>Aide</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="log-out-outline" size={24} color="#D32F2F" />
-              <Text style={[styles.menuItemText, { color: "#D32F2F" }]}>
-                Déconnexion
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </Animated.View>
     </View>
   );
 }
@@ -435,57 +413,52 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  menuOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    zIndex: 20,
-  },
-  menuOverlayPressable: {
-    flex: 1,
-  },
-  menuDrawer: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
-    width: "75%",
-    backgroundColor: "#fff",
-    zIndex: 30,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: -2,
-      height: 0,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  menuContent: {
-    flex: 1,
-    padding: 20,
-  },
-  closeButton: {
-    alignSelf: "flex-end",
-    padding: 10,
-  },
-  menuItemsContainer: {
-    marginTop: 40,
-  },
-  menuItem: {
+  quickRow: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
+  quickBtn: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    gap: 8,
+    flex: 1,
   },
-  menuItemText: {
-    fontSize: 16,
-    marginLeft: 15,
-    color: "#1A2E28",
-    fontWeight: "500",
+  quickText: { color: "#1A2E28", fontSize: 14, fontWeight: "600" },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
   },
+  recoRow: { flexDirection: "row", gap: 8, flexWrap: "wrap", marginTop: 8 },
+  recoChip: {
+    backgroundColor: "#F4F9F6",
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#D0DDD8",
+  },
+  recoText: { color: "#1A2E28", fontSize: 13, fontWeight: "600" },
+  recoHint: { color: "#5A7D70", fontSize: 12, marginTop: 8 },
+  categoriesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  categoryCard: {
+    width: (width - 60) / 2,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    alignItems: "center",
+    gap: 8,
+  },
+  categoryLabel: { color: "#1A2E28", fontSize: 14, fontWeight: "600" },
 });

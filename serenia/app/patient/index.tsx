@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
 import { getActionPlan } from "@/constants/guided-actions";
+import BurgerMenu from "@/components/burger-menu";
 
 const { width, height } = Dimensions.get("window");
 
@@ -313,6 +314,7 @@ export default function PatientChatScreen() {
           />
         </View>
       </SafeAreaView>
+      <BurgerMenu />
       <ScrollView ref={scrollRef} contentContainerStyle={styles.chatContent}>
         {messages.map((m) => (
           <View key={m.id} style={[styles.bubble, bubbleStyle(m.role)]}>
@@ -480,6 +482,13 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
   },
   suggestionText: { color: "#1A2E28", fontSize: 14, fontWeight: "500" },
+  typingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 8,
+  },
+  typingText: { color: "#4B2E83", fontSize: 14 },
   severityRow: {
     flexDirection: "row",
     justifyContent: "space-between",

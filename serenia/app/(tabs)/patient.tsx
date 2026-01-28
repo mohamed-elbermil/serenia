@@ -1,2 +1,1 @@
-import PatientChatScreen from '@/app/patient/index';
-export default PatientChatScreen;
+export { default } from "../patient";

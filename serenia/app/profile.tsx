@@ -1,30 +1,131 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
+import * as ImagePicker from "expo-image-picker";
+import { loadProfile, saveProfile, isValidEmail, type Profile } from "@/utils/profile";
+import BurgerMenu from "@/components/burger-menu";
 
 export default function ProfileScreen() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const p = await loadProfile();
+      if (p) {
+        setName(p.name ?? "");
+        setEmail(p.email ?? "");
+        setAvatarUri(p.avatarUri ?? null);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  const validate = () => {
+    const next: { name?: string; email?: string } = {};
+    if (!name.trim()) next.name = "Le nom est requis.";
+    if (!email.trim()) next.email = "L’email est requis.";
+    else if (!isValidEmail(email)) next.email = "Email invalide.";
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  const pickAvatar = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission requise",
+        "Veuillez autoriser l’accès à la médiathèque.",
+      );
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+      allowsEditing: true,
+      aspect: [1, 1],
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setAvatarUri(result.assets[0].uri);
+    }
+  };
+
+  const onSave = async () => {
+    if (!validate()) return;
+    const profile: Profile = { name, email, avatarUri };
+    await saveProfile(profile);
+    Alert.alert("Enregistré", "Votre profil a été sauvegardé.");
+  };
+
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.header}>
         <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>Mon Profil</Text>
-          <Ionicons name="person-circle-outline" size={24} color={Colors.light.tint} />
+          <Ionicons
+            name="person-circle-outline"
+            size={24}
+            color={Colors.light.tint}
+          />
         </View>
       </SafeAreaView>
+      <BurgerMenu />
 
       <View style={styles.content}>
         <View style={styles.card}>
           <View style={styles.avatarRow}>
-            <View style={styles.avatarPlaceholder}>
-              <Ionicons name="person" size={40} color="#78908A" />
-            </View>
+            <TouchableOpacity
+              style={styles.avatarPlaceholder}
+              onPress={pickAvatar}
+            >
+              {avatarUri ? (
+                <Image
+                  source={{ uri: avatarUri }}
+                  style={{ width: 64, height: 64, borderRadius: 32 }}
+                />
+              ) : (
+                <Ionicons name="person" size={40} color="#78908A" />
+              )}
+            </TouchableOpacity>
             <View style={styles.infoCol}>
               <Text style={styles.label}>Nom</Text>
-              <Text style={styles.value}>Indisponible</Text>
+              <TextInput
+                value={name}
+                onChangeText={(t) => setName(t)}
+                placeholder="Votre nom"
+                placeholderTextColor="#78908A"
+                style={styles.input}
+              />
+              {!!errors.name && (
+                <Text style={styles.errorText}>{errors.name}</Text>
+              )}
               <Text style={[styles.label, { marginTop: 10 }]}>Email</Text>
-              <Text style={styles.value}>Indisponible</Text>
+              <TextInput
+                value={email}
+                onChangeText={(t) => setEmail(t)}
+                placeholder="vous@exemple.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                placeholderTextColor="#78908A"
+                style={styles.input}
+              />
+              {!!errors.email && (
+                <Text style={styles.errorText}>{errors.email}</Text>
+              )}
             </View>
           </View>
 
@@ -32,10 +133,14 @@ export default function ProfileScreen() {
 
           <Text style={styles.sectionTitle}>Édition</Text>
           <Text style={styles.sectionText}>
-            La modification des informations n’est pas encore implémentée.
+            Vous pouvez modifier vos informations ci-dessus.
           </Text>
-          <TouchableOpacity disabled style={styles.editBtn}>
-            <Text style={styles.editBtnText}>Modifier (à venir)</Text>
+          <TouchableOpacity
+            onPress={onSave}
+            style={styles.editBtn}
+            disabled={loading}
+          >
+            <Text style={styles.editBtnText}>Enregistrer</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -75,7 +180,17 @@ const styles = StyleSheet.create({
   },
   infoCol: { flex: 1 },
   label: { color: "#5A7D70", fontSize: 12 },
-  value: { color: "#1A2E28", fontSize: 16, fontWeight: "600" },
+  input: {
+    color: "#1A2E28",
+    fontSize: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginTop: 4,
+  },
   divider: {
     height: 1,
     backgroundColor: "#F0F0F0",
@@ -91,4 +206,5 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   editBtnText: { color: "#1A2E28", fontSize: 14, fontWeight: "600" },
+  errorText: { color: "#D32F2F", fontSize: 12, marginTop: 4 },
 });

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/theme";
+import BurgerMenu from "@/components/burger-menu";
 
 export default function SettingsScreen() {
   const [notifEnabled, setNotifEnabled] = useState(false);
@@ -13,9 +14,14 @@ export default function SettingsScreen() {
       <SafeAreaView style={styles.header}>
         <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>Paramètres</Text>
-          <Ionicons name="settings-outline" size={24} color={Colors.light.tint} />
+          <Ionicons
+            name="settings-outline"
+            size={24}
+            color={Colors.light.tint}
+          />
         </View>
       </SafeAreaView>
+      <BurgerMenu />
 
       <View style={styles.content}>
         <View style={styles.card}>
@@ -29,14 +35,16 @@ export default function SettingsScreen() {
             <Switch value={darkTheme} onValueChange={setDarkTheme} />
           </View>
           <Text style={styles.hint}>
-            Ces paramètres sont des placeholders et ne sont pas encore persistés.
+            Ces paramètres sont des placeholders et ne sont pas encore
+            persistés.
           </Text>
         </View>
 
         <View style={[styles.card, { marginTop: 12 }]}>
           <Text style={styles.sectionTitle}>Expérience</Text>
           <Text style={styles.sectionText}>
-            Aucune option spécifique n’est encore disponible. Structure prête pour évolutions.
+            Aucune option spécifique n’est encore disponible. Structure prête
+            pour évolutions.
           </Text>
         </View>
       </View>
@@ -64,7 +72,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
   },
-  sectionTitle: { color: "#1A2E28", fontSize: 16, fontWeight: "700", marginBottom: 8 },
+  sectionTitle: {
+    color: "#1A2E28",
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
