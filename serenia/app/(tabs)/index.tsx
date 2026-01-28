@@ -12,6 +12,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import MoodChart from "@/components/mood-chart";
+import {
+  emojiToValue,
+  upsertMood,
+  timeSeries,
+  MoodAggregate,
+} from "@/utils/mood";
 
 const { width } = Dimensions.get("window");
 
@@ -19,6 +26,8 @@ export default function HomeScreen() {
   const [selectedMoodIndex, setSelectedMoodIndex] = useState<number | null>(
     null,
   );
+  const [moodAgg, setMoodAgg] = useState<Record<string, MoodAggregate>>({});
+  const [chartRange, setChartRange] = useState<7 | 30>(7);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -117,7 +126,13 @@ export default function HomeScreen() {
             {["😊", "😐", "😔", "😭", "😡"].map((emoji, index) => (
               <TouchableOpacity
                 key={index}
-                onPress={() => setSelectedMoodIndex(index)}
+                onPress={() => {
+                  setSelectedMoodIndex(index);
+                  const v = emojiToValue(emoji);
+                  const next = { ...moodAgg };
+                  upsertMood(next, new Date(), v);
+                  setMoodAgg(next);
+                }}
                 style={[
                   styles.moodItem,
                   selectedMoodIndex === index && styles.moodSelected,
@@ -133,70 +148,11 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.progressCard}>
             <Text style={styles.progressTitle}>Vos progrès</Text>
-            <Text style={styles.progressValue}>67%</Text>
-            <View style={styles.chartContainer}>
-              {/* Simulated Chart Placeholder */}
-              <View style={styles.chartLine} />
-              <Ionicons
-                name="radio-button-on"
-                size={24}
-                color="#6DD5B8"
-                style={styles.chartPoint}
-              />
-              <View style={styles.chartPlaceholder}>
-                <Text
-                  style={{
-                    color: "#555",
-                    fontSize: 10,
-                    position: "absolute",
-                    bottom: 10,
-                    left: 10,
-                  }}
-                >
-                  Jan
-                </Text>
-                <Text
-                  style={{
-                    color: "#555",
-                    fontSize: 10,
-                    position: "absolute",
-                    bottom: 10,
-                    right: 10,
-                  }}
-                >
-                  Dec
-                </Text>
-
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 50,
-                    borderTopWidth: 2,
-                    borderColor: "#6DD5B8",
-                    borderTopLeftRadius: 50,
-                    borderTopRightRadius: 20,
-                    opacity: 0.5,
-                  }}
-                />
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: 20,
-                    left: 20,
-                    right: 60,
-                    height: 40,
-                    borderTopWidth: 2,
-                    borderColor: "#FFCC80",
-                    borderTopLeftRadius: 30,
-                    borderTopRightRadius: 40,
-                    opacity: 0.5,
-                  }}
-                />
-              </View>
-            </View>
+            <MoodChart
+              points={timeSeries(moodAgg, chartRange)}
+              range={chartRange}
+              onChangeRange={setChartRange}
+            />
           </View>
         </View>
 
