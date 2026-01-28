@@ -21,16 +21,20 @@ export default function MoodChart({ points, range, onChangeRange }: Props) {
   const width = Dimensions.get("window").width - 40;
   const height = 140;
   const padding = 16;
+  const R = 6;
 
   const { path, circles } = useMemo(() => {
-    const xStep = (width - padding * 2) / Math.max(points.length - 1, 1);
+    const xStep = (width - (padding + R) * 2) / Math.max(points.length - 1, 1);
     const toY = (v: number) => {
       const min = 1;
       const max = 5;
-      const scale = (v - min) / (max - min);
-      return height - padding - scale * (height - padding * 2);
+      const clamped = Math.max(min, Math.min(max, v));
+      const top = padding + R;
+      const bottom = height - padding - R;
+      const scale = (clamped - min) / (max - min);
+      return bottom - scale * (bottom - top);
     };
-    const toX = (i: number) => padding + i * xStep;
+    const toX = (i: number) => padding + R + i * xStep;
     let d = "";
     let started = false;
     const cs: { cx: number; cy: number; i: number }[] = [];
@@ -102,7 +106,7 @@ export default function MoodChart({ points, range, onChangeRange }: Props) {
               key={i}
               cx={cx}
               cy={cy}
-              r={6}
+              r={R}
               fill="#C8E6C9"
               stroke="#3D6056"
               strokeWidth={2}
@@ -116,7 +120,7 @@ export default function MoodChart({ points, range, onChangeRange }: Props) {
               styles.tooltip,
               {
                 left: Math.max(8, Math.min(width - 120, selCircle.cx - 60)),
-                top: selCircle.cy - 48,
+                top: Math.max(8, Math.min(height - 72, selCircle.cy - 48)),
               },
             ]}
           >

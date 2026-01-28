@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter, usePathname } from "expo-router";
 import MoodChart from "@/components/mood-chart";
 import {
   emojiToValue,
@@ -23,6 +24,8 @@ import {
 const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [selectedMoodIndex, setSelectedMoodIndex] = useState<number | null>(
     null,
   );
@@ -67,6 +70,22 @@ export default function HomeScreen() {
         }),
       ]).start();
     }
+  };
+
+  const navigateTo = (path: "/profile" | "/settings" | "/help") => {
+    router.push(path);
+    Animated.parallel([
+      Animated.timing(menuTranslateX, {
+        toValue: MENU_WIDTH,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnimation, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => setIsMenuOpen(false));
   };
 
   // Scroll Animation configuration
@@ -200,17 +219,35 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           <View style={styles.menuItemsContainer}>
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={[
+                styles.menuItem,
+                pathname === "/profile" && { backgroundColor: "#F4F9F6" },
+              ]}
+              onPress={() => navigateTo("/profile")}
+            >
               <Ionicons name="person-outline" size={24} color="#1A2E28" />
               <Text style={styles.menuItemText}>Mon Profil</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={[
+                styles.menuItem,
+                pathname === "/settings" && { backgroundColor: "#F4F9F6" },
+              ]}
+              onPress={() => navigateTo("/settings")}
+            >
               <Ionicons name="settings-outline" size={24} color="#1A2E28" />
               <Text style={styles.menuItemText}>Paramètres</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={[
+                styles.menuItem,
+                pathname === "/help" && { backgroundColor: "#F4F9F6" },
+              ]}
+              onPress={() => navigateTo("/help")}
+            >
               <Ionicons name="help-circle-outline" size={24} color="#1A2E28" />
               <Text style={styles.menuItemText}>Aide</Text>
             </TouchableOpacity>
